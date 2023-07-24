@@ -36,7 +36,7 @@ Train an additional layer, but without LoRA
 
 ```python
 # 'lin1' is trained normally
-config = LoraConfig(target_modules="lin0"), modules_to_save=["lin1"])
+config = LoraConfig(target_modules="lin0", modules_to_save=["lin1"])
 model = AdapterWrapper.from_config(MLP(), config)
 train(model, X, y)
 ```
@@ -51,11 +51,13 @@ These things are not possible in PEFT.
 model = AdapterWrapper(MLP())
 model.add_adapter()
 
-# pass the uninitialized layer to add_adapter
+# pass the uninitialized layer to add_adapter_layer
 lin0_lora = partial(LinearLoraLayer, r=4)
 model.add_adapter_layer("lin0", lin0_lora)
 lin1_lora = partial(LinearLoraLayer, r=16)
 model.add_adapter_layer("lin1", lin1_lora)
+# delete adapter layer again
+model.delete_adapter_layer("lin1")
 ```
 
 ### Mixing different types of adapters
@@ -88,21 +90,8 @@ model.add_adapter_layer("lin0", MyLinearLayer)
 This is the same as in PEFT:
 
 ```python
-# create a model with the "default" adapter
-config = ...
-model = AdapterWrapper.from_config(MLP(), config, adapter_name="default")
-
-# create a new adapter
-model.add_adapter("other-adapter")
-
-# add new adapter layer
-model.add_adapter_layer("lin1", LinearLoraLayer)
-
-# delete adapter layer
-model.delete_adapter_layer("lin1")
-
 # switch to a different adapter
-model.set_adapter("default")
+model.set_adapter(<adapter-name>)
 
 # merging
 model.merge_adapter()
