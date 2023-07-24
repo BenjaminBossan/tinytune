@@ -240,7 +240,7 @@ class TestAltLora:
                 assert not torch.allclose(param_before, param_after)
             else:
                 assert not param_after.requires_grad
-                torch.testing.assert_allclose(param_before, param_after)
+                torch.testing.assert_close(param_before, param_after)
 
         # all B layers should be the same
         for key, param_before in params_B_before.items():
