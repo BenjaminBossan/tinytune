@@ -12,7 +12,9 @@ from .ia3 import IA3Config, LinearIA3Layer
 from .lora import EmbeddingLoraLayer, LinearLoraLayer, LoraConfig
 
 
-def _get_selection_strategy(config: AdapterConfig, base_model: nn.Module) -> Any:  # TODO
+def _get_selection_strategy(
+    config: AdapterConfig, base_model: nn.Module
+) -> Any:  # TODO
     if isinstance(config.target_modules, str):
         return _regex_selection_strategy(config, base_model)
     if isinstance(config.target_modules, list):
@@ -20,14 +22,18 @@ def _get_selection_strategy(config: AdapterConfig, base_model: nn.Module) -> Any
     raise ValueError("TODO")
 
 
-def _regex_selection_strategy(config: AdapterConfig, base_model: nn.Module) -> Iterator[tuple[str, Any]]:
+def _regex_selection_strategy(
+    config: AdapterConfig, base_model: nn.Module
+) -> Iterator[tuple[str, Any]]:
     assert isinstance(config.target_modules, str)
     for name, _ in base_model.named_modules():
         if re.fullmatch(config.target_modules, name):
             yield name, None
 
 
-def _list_match_selection_strategy(config: AdapterConfig, base_model: nn.Module) -> Iterator[tuple[str, Any]]:
+def _list_match_selection_strategy(
+    config: AdapterConfig, base_model: nn.Module
+) -> Iterator[tuple[str, Any]]:
     assert isinstance(config.target_modules, list)
     assert isinstance(config.target_modules[0], str)
     for name, _ in base_model.named_modules():
@@ -65,4 +71,7 @@ class _OneToOneMappingStrategy:
             if isinstance(self.config, LoraConfig):
                 return EmbeddingLoraLayer.from_config(self.config, layer)
 
-        raise TypeError(f"Could not find a suitable adapter layer for {type(layer)} and config {type(self.config)}")
+        raise TypeError(
+            f"Could not find a suitable adapter layer for {type(layer)} and config "
+            f"{type(self.config)}"
+        )

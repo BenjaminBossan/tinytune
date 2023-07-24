@@ -70,7 +70,9 @@ class LoraLayer(AdapterLayer):
 class LinearLoraLayer(LoraLayer):
     def reset_params(self) -> None:
         if not isinstance(self.base_module, nn.Linear):
-            raise ValueError(f"{self.__class__.__name__} must be applied to an nn.Linear layer")
+            raise ValueError(
+                f"{self.__class__.__name__} must be applied to an nn.Linear layer"
+            )
 
         self.lora_A = nn.Linear(self.base_module.in_features, self.r, bias=False)
         self.lora_B = nn.Linear(self.r, self.base_module.out_features, bias=False)
@@ -83,7 +85,9 @@ class LinearLoraLayer(LoraLayer):
 class EmbeddingLoraLayer(LoraLayer):
     def reset_params(self) -> None:
         if not isinstance(self.base_module, nn.Embedding):
-            raise ValueError(f"{self.__class__.__name__} must be applied to an nn.Embedding layer")
+            raise ValueError(
+                f"{self.__class__.__name__} must be applied to an nn.Embedding layer"
+            )
 
         self.lora_A = nn.Embedding(
             self.base_module.num_embeddings,

@@ -15,7 +15,9 @@ class IA3Config(AdapterConfig):
 
 class LinearIA3Layer(AdapterLayer):
     @classmethod
-    def from_config(cls, config: AdapterConfig, base_module: nn.Module) -> LinearIA3Layer:
+    def from_config(
+        cls, config: AdapterConfig, base_module: nn.Module
+    ) -> LinearIA3Layer:
         return cls(base_module)
 
     def reset_device(self) -> None:
@@ -23,7 +25,9 @@ class LinearIA3Layer(AdapterLayer):
 
     def reset_params(self) -> None:
         if not isinstance(self.base_module, nn.Linear):
-            raise ValueError(f"{self.__class__.__name__} must be applied to an nn.Linear layer")
+            raise ValueError(
+                f"{self.__class__.__name__} must be applied to an nn.Linear layer"
+            )
         self.ia3_weight = nn.Parameter(torch.ones_like(self.base_module.weight[:1]))
 
     def reset_requires_grad(self) -> None:
@@ -41,7 +45,6 @@ class LinearIA3Layer(AdapterLayer):
             return
 
         self.base_module.weight.data *= self.ia3_weight
-        #self.base_module.weight.data = torch.mul(self.base_module.weight.data, self.ia3_weight.data)
         self.merged = True
 
     def unmerge(self) -> None:
@@ -49,5 +52,4 @@ class LinearIA3Layer(AdapterLayer):
             return
 
         self.base_module.weight.data /= self.ia3_weight
-        #self.base_module.weight.data = torch.div(self.base_module.weight.data, self.ia3_weight.data + 1e-8)
         self.merged = False

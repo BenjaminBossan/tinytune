@@ -24,7 +24,9 @@ class Adapter:
         for name, layer in self._adapter_layers.items():
             self._replace_layer(self.model, name, layer.base_module)
 
-    def _replace_layer(self, base_model: nn.Module, name: str, new_layer: nn.Module) -> None:
+    def _replace_layer(
+        self, base_model: nn.Module, name: str, new_layer: nn.Module
+    ) -> None:
         # TODO: deal with ModuleList, ModuleDict
         old_layer = getattr(base_model, name, None)
         if old_layer is None:
@@ -34,7 +36,9 @@ class Adapter:
             return
 
         if isinstance(old_layer, AdapterLayer) and isinstance(new_layer, AdapterLayer):
-            raise ValueError("Trying to replace an adapter layer with another adapter layer")
+            raise ValueError(
+                "Trying to replace an adapter layer with another adapter layer"
+            )
 
         if getattr(base_model, name) is not new_layer:
             setattr(base_model, name, new_layer)
@@ -65,7 +69,10 @@ class Adapter:
     def _delete_layer(self, name: str) -> None:
         existing_names = self._adapter_layers.keys()
         if name not in existing_names:
-            raise KeyError(f"Adapter layer {name} does not exist, existing layers: {existing_names}")
+            raise KeyError(
+                f"Adapter layer {name} does not exist, existing layers: "
+                f"{existing_names}"
+            )
 
         adapter_layer = self._adapter_layers.pop(name)
         assert isinstance(adapter_layer, AdapterLayer)
@@ -145,16 +152,23 @@ class AdapterWrapper(nn.Module):
         is_active_adapter = adapter_name == self._active_adapter_name
         if is_active_adapter:
             self.unmerge_adapter()
-            # we know there must be a key != currently active adapter because of the check above
-            guess_next_adapter = next(k for k in self._adapter_registry if k != adapter_name)
+            # we know there must be a key != currently active adapter because of
+            # the check above
+            guess_next_adapter = next(
+                k for k in self._adapter_registry if k != adapter_name
+            )
             self.set_adapter(guess_next_adapter)
 
         del self._adapter_registry[adapter_name]
 
-    def add_adapter_layer(self, name: str, layer: AdapterLayer | Type[AdapterLayer]) -> None:
+    def add_adapter_layer(
+        self, name: str, layer: AdapterLayer | Type[AdapterLayer]
+    ) -> None:
         """Add an adapter layer to the active adapter."""
         if self.active_adapter is None:
-            raise ValueError("There is no active adapter, create it first by calling .add_adapter")
+            raise ValueError(
+                "There is no active adapter, create it first by calling .add_adapter"
+            )
 
         self.active_adapter._add_layer(name, layer)
         self.active_adapter._apply()
@@ -206,7 +220,9 @@ class AdapterWrapper(nn.Module):
     # CREATION FROM CONFIG #
     ########################
 
-    def add_adapter_from_config(self, config: AdapterConfig, adapter_name: str = "default") -> AdapterWrapper:
+    def add_adapter_from_config(
+        self, config: AdapterConfig, adapter_name: str = "default"
+    ) -> AdapterWrapper:
         self.add_adapter(adapter_name)
 
         selection_strategy = _get_selection_strategy(config, self.model)
@@ -227,7 +243,9 @@ class AdapterWrapper(nn.Module):
         return self
 
     @classmethod
-    def from_config(cls, model: nn.Module, config: AdapterConfig, adapter_name: str = "default") -> AdapterWrapper:
+    def from_config(
+        cls, model: nn.Module, config: AdapterConfig, adapter_name: str = "default"
+    ) -> AdapterWrapper:
         wrapper = cls(model, config=config)
         wrapper.add_adapter_from_config(config, adapter_name)
         return wrapper
