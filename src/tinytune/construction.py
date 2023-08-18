@@ -63,13 +63,13 @@ class _OneToOneMappingStrategy:
 
         if isinstance(layer, nn.Linear):
             if isinstance(self.config, LoraConfig):
-                return LinearLoraLayer.from_config(self.config, layer)
+                return LinearLoraLayer.from_config(self.config)
             if isinstance(self.config, IA3Config):
-                return LinearIA3Layer.from_config(self.config, layer)
+                return LinearIA3Layer.from_config(self.config)
 
         if isinstance(layer, nn.Embedding):
             if isinstance(self.config, LoraConfig):
-                return EmbeddingLoraLayer.from_config(self.config, layer)
+                return EmbeddingLoraLayer.from_config(self.config)
 
         raise TypeError(
             f"Could not find a suitable adapter layer for {type(layer)} and config "
